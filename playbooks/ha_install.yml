@@ -1,0 +1,48 @@
+---
+
+- name: Install Postgresql Databases
+  hosts: database, database_replica
+  become: true
+
+  roles:
+    - role: "postgres_install"
+
+- name: Replicate Postgresql Databases
+  hosts: database, database_replica
+  become: true
+
+  roles:
+    - role: "postgres_replication"
+
+- name: Replicate Postgresql HAProxy
+  hosts: lb_databases
+  become: true
+
+  roles:
+    - role: "postgres_haproxy"
+
+# - name: Prepare UI Servers
+#   hosts: ui
+#   become: true
+
+#   roles:
+#     - role: "prepare_servers"
+
+# - name: Install Ansible Tower
+#   hosts: ui[0]
+#   become: true
+
+#   roles:
+#     - role: "tower_install"
+
+# - name: Install Load Balancer for Ansible Tower UI
+#   hosts: lb_ui
+#   become: true
+
+#   roles:
+#     - role: "tower_haproxy"
+#       vars:
+#         lb_groups_key: 'ui'
+
+# yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+# /usr/src/ansible-tower-setup-3.5.1-1/setup.log

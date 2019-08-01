@@ -1,0 +1,44 @@
+---
+
+ 
+postgresql_version: 9.6
+
+pgsqlrep_role: skip
+pgsqlrep_data_string: "/var/lib/pgsql/{{postgresql_version }}/data"
+pgsqlrep_data_path: "{{ postgresql_data_path|default(pgsqlrep_data_string) }}"
+pgsqlrep_user: replicator
+pgsqlrep_password: ''
+pgsqlrep_wal_level: hot_standby
+pgsqlrep_max_wal_senders: "{{ groups[pgsqlrep_group_name] | length * 2 }}"
+pgsqlrep_wal_keep_segments: 100
+pgsqlrep_synchronous_commit: local
+pgsqlrep_application_name: "{{ postgresql_database|default('tower') }}"
+pgsqlrep_master_port: "{{ postgresql_port|default(5432) }}"
+bundle_install: no
+
+pgsqlrep_group_name: database_replica
+pgsqlrep_group_name_master: database
+
+#pgsqlrep_master_address: "{{ hostvars[groups[pgsqlrep_group_name_master][0]].ansible_default_ipv4.address }}"
+#pgsqlrep_replica_address: "{{ groups[pgsqlrep_group_name] | map('extract', hostvars, 'ansible_default_ipv4') | map(attribute='address') | list }}"
+
+pgsqlrep_master_address: 172.15.18.12
+
+pgsqlrep_replica_address:
+  - 172.15.18.13
+
+pgsqlrep_postgres_conf_lines:
+  - regexp: '#?wal_level = \w+(\s+#.*)'
+    line: 'wal_level = {{ pgsqlrep_wal_level }}\1'
+
+  - regexp: '#?max_wal_senders = \d+(\s+#.*)'
+    line: 'max_wal_senders = {{ pgsqlrep_max_wal_senders }}\1'
+
+  - regexp: '#?wal_keep_segments = .*(\s+#.*)'
+    line: 'wal_keep_segments = {{ pgsqlrep_wal_keep_segments }}\1'
+
+  - regexp: '#?synchronous_standby_names = .*'
+    line: "synchronous_standby_names = '{{ pgsqlrep_application_name }}'"
+
+  - regexp: '#?synchronous_commit = \w+(\s+#.*)'
+    line: 'synchronous_commit = {{ pgsqlrep_synchronous_commit }}\1'
