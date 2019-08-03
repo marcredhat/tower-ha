@@ -1,5 +1,31 @@
 ---
 
+- name: Update packages
+  hosts: all
+  become: true
+
+  tasks:
+  - name: Update Kernel
+    yum:
+      name: kernel 
+      state: latest
+
+  - name: update packages 
+    yum:
+      name: '*'
+      state: latest
+
+  - name: Install Firewalld 
+    yum:
+      name: 'firewalld'
+      state: latest
+
+  - name: Stop firewalld
+    service:
+      name: firewalld
+      state: stopped
+      enabled: false
+
 - name: Install Postgresql Databases
   hosts: database, database_replica
   become: true
