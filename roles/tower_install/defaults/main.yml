@@ -1,22 +1,4 @@
 ---
-# ansible_tower_version: 3.5.1-1             #3.5.1
-
-# postgresql_host: ''                  #5432
-# postgresql_database: tower                #awx
-# postgresql_username: ansible_tower        #tower
-# postgresql_password: Redhat@2019!
-
-# rabbitmq_host: ''
-# rabbitmq_port: 5672                       #5672
-# rabbitmq_username: tower                  #tower
-# rabbitmq_cookie: cookiemonster            #cookiemonster
-# rabbitmq_password: smartvm
-# rabbitmq_enable_manager: true
-# # Needs to be true for fqdns and ip addresses
-# rabbitmq_use_long_name: true
-
-# admin_password: smartvm
-
 ansibletower:
   no_log: false
   root: "/usr/src"

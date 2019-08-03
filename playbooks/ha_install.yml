@@ -21,28 +21,41 @@
   roles:
     - role: "postgres_haproxy"
 
-# - name: Prepare UI Servers
-#   hosts: ui
-#   become: true
+- name: Prepare UI Servers
+  hosts: ui
+  become: true
 
-#   roles:
-#     - role: "prepare_servers"
+  roles:
+    - role: "prepare_servers"
 
-# - name: Install Ansible Tower
-#   hosts: ui[0]
-#   become: true
+- name: Install Ansible Tower
+  hosts: ui[0]
+  become: true
 
-#   roles:
-#     - role: "tower_install"
+  roles:
+    - role: "tower_install"
 
-# - name: Install Load Balancer for Ansible Tower UI
-#   hosts: lb_ui
-#   become: true
+- name: Install Load Balancer for Ansible Tower UI
+  hosts: lb_ui
+  become: true
 
-#   roles:
-#     - role: "tower_haproxy"
-#       vars:
-#         lb_groups_key: 'ui'
+  roles:
+    - role: "tower_haproxy"
+      vars:
+        lb_groups_key: 'ui'
 
-# yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-# /usr/src/ansible-tower-setup-3.5.1-1/setup.log
+- name: Update ui servers to point to Postgresl Load Balancer
+  hosts: ui
+  become: true
+
+  tasks:
+    - name: Update the postgres.py
+      lineinfile:
+        path: /etc/tower/conf.d/postgres.py
+        regexp: "'HOST': '{{ groups['database'][0] }}',"
+        line: "'HOST': '{{ groups['lb_databases'][0] }}',"
+      when: groups['lb_databases']|length > 0
+
+    - name: Restart tower
+      command: ansible-tower-service restart
+      when: groups['lb_databases']|length > 0

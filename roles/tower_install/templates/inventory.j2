@@ -1,15 +1,18 @@
 [tower]
-172.15.18.14 ansible_user=vagrant ansible_ssh_private_key_file=~/ui1_private_key
-172.15.18.15 ansible_user=vagrant ansible_ssh_private_key_file=~/ui2_private_key
+{% for host in groups['ui'] %}
+{{ host }} ansible_user={{ ansible_user }} ansible_ssh_private_key_file={{ host_private_key[host] | default('') }}
+{% endfor %}
 
 [database]
-172.15.18.12  ansible_user=vagrant ansible_ssh_private_key_file=~/db_private_key
+{% for host in groups['database'] %}
+{{ host }} ansible_user={{ ansible_user | default('root') }} ansible_ssh_private_key_file={{ host_private_key[host] | default('') }}
+{% endfor %}
 
 [all:vars]
 admin_password='{{ ansibletower.credentials.admin }}'
 ansible_become=true
 
-pg_host='172.15.18.12'
+pg_host='{{ groups['database'][0] | default() }}'
 pg_port='{{ ansibletower.postgresql.port }}'
 
 pg_database='{{ ansibletower.postgresql.database }}'

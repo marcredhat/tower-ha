@@ -27,6 +27,9 @@
     name: haproxy
     state: present
 
+- name: Set selinux
+  command: setsebool -P haproxy_connect_any=1
+
 - name: Make sure haproxy started and enabled
   service:
     name: haproxy
