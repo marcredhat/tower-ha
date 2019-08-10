@@ -77,15 +77,20 @@
 # TYPE  DATABASE        USER            ADDRESS                 METHOD
 
 # "local" is for Unix domain socket connections only
-local   all             all                                     peer
+#local   all             all                                     peer
 # IPv4 local connections:
-host    all             all             127.0.0.1/32            md5
+#host    all             all             127.0.0.1/32            md5
 # IPv4 local connections:
-host    all             all             0.0.0.0/0               md5
+#host    all             all             0.0.0.0/0               md5
 # IPv6 local connections:
-host    all             all             ::1/128                 md5
+#host    all             all             ::1/128                 md5
 # Allow replication connections from localhost, by a user with the
 # replication privilege.
 local   postgres        postgres                                trust
-#host    replication     postgres        127.0.0.1/32            ident
-#host    replication     postgres        ::1/128                 ident
+local   repmgr          repmgr                                  trust
+host    postgres     	haproxy        	127.0.0.1/32            trust
+host    postgres     	haproxy        	::1/128                 trust
+{% for item in groups['database'] + groups['database_replica'] %}
+host    repmgr          {{ pgsqlrep_repmgr_user }}          {{ item }}/32     	trust
+host    replication     {{ pgsqlrep_repmgr_user }}          {{ item }}/32     	trust
+{% endfor %}

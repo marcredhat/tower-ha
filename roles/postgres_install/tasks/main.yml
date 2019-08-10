@@ -1,8 +1,4 @@
 ---
-- name: Update all packages 
-  yum:
-    name: '*'
-    state: latest
 
 - name: Update firewalld
   firewalld:
@@ -34,6 +30,11 @@
   command: "/usr/pgsql-{{ postgresql_version }}/bin/postgresql{{ postgresql_version_no_dots }}-setup initdb"
   when: not postgres_initialized.stat.exists
 
+- name: Update the sym link to pg_ctl
+  command: ln -s /usr/pgsql-9.6/bin/pg_ctl /usr/bin/pg_ctl
+  changed_when: false
+  ignore_errors: true
+
 - name: copy pg_hba.conf so user/pass authentication works in postgres
   template:
     src: pg_hba.conf
@@ -49,7 +50,7 @@
     insertafter: '^#listen_addresses'
     line: "listen_addresses = '*'"
 
-- name: Update the listen_addresses
+- name: Update the port to listen on
   lineinfile:
     path: "{{ postgresql_data_path }}/postgresql.conf"
     regex: "^#port = 5432"
