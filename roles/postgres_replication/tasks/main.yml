@@ -78,32 +78,3 @@
     name: repmgr96
     state: started
     enabled: true
-
-- name: Install xinetd
-  yum:
-    name: xinetd
-    state: present
-
-- name: Copy the postgreschk script
-  template:
-    src:  postgreschk.j2
-    dest: /usr/local/sbin/postgreschk
-    mode: 0655
-
-- name: Install the postgreschk service
-  copy:
-    src: postgreschk
-    dest: /etc/xinetd.d/postgreschk
-    mode: 0644
-
-- name: Add the /etc/services line entry
-  lineinfile:
-    path: /etc/services
-    regexp: 'postgreschk        9201/tcp'
-    line: 'postgreschk        9201/tcp'
-
-- name: Start the xinetd service
-  service:
-    name: xinetd
-    state: restarted
-    enabled: true

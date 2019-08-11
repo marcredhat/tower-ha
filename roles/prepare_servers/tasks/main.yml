@@ -8,6 +8,3 @@
     path: /etc/ansible/ansible.cfg
     regex: "^#host_key_checking"
     line: "host_key_checking=false"
-
-- name: Include extra tasks
-  include_tasks: "extras.yml"
